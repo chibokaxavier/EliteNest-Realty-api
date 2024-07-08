@@ -15,7 +15,4 @@ const start = async () => {
 };
 start();
 
-app.get('/',(req,res)=>{
-   res.send("Hello") 
-})
 app.use('/api/user',userRouter)
