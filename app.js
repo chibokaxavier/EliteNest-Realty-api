@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const port = 3001;
+const userRouter = require('./routes/user.router')
 require("dotenv").config();
 
 const start = async () => {
@@ -13,3 +14,8 @@ const start = async () => {
   }
 };
 start();
+
+app.get('/',(req,res)=>{
+   res.send("Hello") 
+})
+app.use('/api/user',userRouter)
