@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const port = 3001;
 const userRouter = require("./routes/user.router");
 const authRouter = require("./routes/auth.router");
+const cors = require("cors");
 require("dotenv").config();
 
 const start = async () => {
@@ -15,9 +16,15 @@ const start = async () => {
   }
 };
 start();
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+  })
+);
 app.use(express.json());
 app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
+
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   const message = err.message || "Internal server error";
