@@ -1,6 +1,8 @@
 const User = require("../models/user.model");
 const bcryptjs = require("bcryptjs");
 const errorHandler = require("../utils/error");
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
 const signUp = async (req, res, next) => {
   try {
@@ -27,21 +29,20 @@ const signUp = async (req, res, next) => {
   }
 };
 
-const signin = async (req, res, next) => {
+const signIn = async (req, res, next) => {
   const { email, password } = req.body;
   try {
     const validUser = await User.findOne({ email });
-    if (!validUser)
-      return next(errorHandler(404, "Credentiials are not valid"));
-    const validPassowrd = await bcryptjs.compareSync(
-      password,
-      validUser.password
-    );
+    if (!validUser) return next(errorHandler(404, "User doesnt exist"));
+    const validPassword = bcryptjs.compareSync(password, validUser.password);
     if (!validPassword)
       return next(errorHandler(404, "Credentials are not valid"));
+    const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);
+    const { password: pass, ...user } = validUser._doc;
+    res.cookie("token", token, { httpOnly: true }).status(200).json({ user });
   } catch (error) {
     next(error);
   }
 };
 
-module.exports = { signUp };
+module.exports = { signUp, signIn };
