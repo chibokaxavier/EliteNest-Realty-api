@@ -33,7 +33,7 @@ const signIn = async (req, res, next) => {
   const { email, password } = req.body;
   try {
     const validUser = await User.findOne({ email });
-    if (!validUser) return next(errorHandler(404, "User doesnt exist"));
+    if (!validUser) return next(errorHandler(404, "Credentials are not valid"));
     const validPassword = bcryptjs.compareSync(password, validUser.password);
     if (!validPassword)
       return next(errorHandler(404, "Credentials are not valid"));
@@ -44,5 +44,43 @@ const signIn = async (req, res, next) => {
     next(error);
   }
 };
+const googleSignIn = async (req, res, next) => {
+  try {
+    const existingUser = await User.findOne({ email: req.body.email });
+    if (existingUser) {
+      const token = jwt.sign({ id: existingUser._id }, process.env.JWT_SECRET);
+      const { password: pass, ...userWithoutPassword } = existingUser._doc;
+      res
+        .cookie("token", token, { httpOnly: true })
+        .status(200)
+        .json({ user: userWithoutPassword });
+    } else {
+      const generatedPassword =
+        Math.random().toString(36).slice(-8) +
+        Math.random().toString(36).slice(-8);
+      const hashedPassword = bcryptjs.hashSync(generatedPassword, 10);
+      let username = req.body.name.toLowerCase();
+      if (username.includes(" ")) {
+        username =
+          username.split(" ").join("") + Math.random().toString(36).slice(-4);
+      } else {
+        username = username + Math.random().toString(36).slice(-4);
+      }
+      console.log(username);
+      const newUser = await User.create({
+        userName: username,
+        email: req.body.email,
+        password: hashedPassword,
+        avatar: req.body.photo,
+      });
+      console.log(newUser);
+      const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
+      const { password: pass, ...user } = newUser;
+      res.cookie("token", token, { httpOnly: true }).status(200).json({ user });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
 
-module.exports = { signUp, signIn };
+module.exports = { signUp, signIn, googleSignIn };
