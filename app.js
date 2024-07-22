@@ -5,6 +5,7 @@ const port = 3001;
 const userRouter = require("./routes/user.router");
 const authRouter = require("./routes/auth.router");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 require("dotenv").config();
 
 const start = async () => {
@@ -23,6 +24,7 @@ app.use(
   })
 );
 app.use(express.json());
+app.use(cookieParser()); 
 app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
 
