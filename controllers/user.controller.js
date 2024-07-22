@@ -5,5 +5,5 @@ const test = async (req, res) => {
     console.log(error);
   }
 };
-
-module.exports ={test}
+const updateUser = async (req, res) => {};
+module.exports = { test, updateUser };

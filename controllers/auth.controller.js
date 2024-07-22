@@ -66,7 +66,6 @@ const googleSignIn = async (req, res, next) => {
       } else {
         username = username + Math.random().toString(36).slice(-4);
       }
-      console.log(username);
       const newUser = await User.create({
         userName: username,
         email: req.body.email,
