@@ -3,19 +3,15 @@ const User = require("../models/user.model");
 const errorHandler = require("../utils/error");
 const bcryptjs = require("bcryptjs");
 
-const test = async (req, res) => {
-  try {
-    res.json({ message: "confirmed" });
-  } catch (error) {
-    console.log(error);
-  }
-};
 const updateUser = async (req, res, next) => {
-  const { userName, email, password } = req.body;
-  if (req.user.id !== req.params.id) {
+  const { userName, email, password, avatar } = req.body;
+  // if (req.user.id.toString() !== req.params.id.toString()) {
+  //   return console.log(req.user.id);
+  // }
+  if (req.user.id.toString() !== req.params.id.toString()) {
     return next(errorHandler(401, "You can only update your own account"));
   }
-  
+
   try {
     const existingUsername = await User.findOne({ userName });
     const existingEmail = await User.findOne({ email });
@@ -43,9 +39,9 @@ const updateUser = async (req, res, next) => {
       { new: true, runValidators: true }
     );
     const { password: pass, ...rest } = updatedUser._doc;
-    res.status(200).json({ rest });
+    res.status(200).json({ user: rest });
   } catch (error) {
-    next(error)
+    next(error);
   }
 };
-module.exports = { test, updateUser };
+module.exports = { updateUser };

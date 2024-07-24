@@ -37,7 +37,10 @@ const signIn = async (req, res, next) => {
     const validPassword = bcryptjs.compareSync(password, validUser.password);
     if (!validPassword)
       return next(errorHandler(404, "Credentials are not valid"));
-    const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);
+    const token = jwt.sign(
+      { id: validUser._id.toString() },
+      process.env.JWT_SECRET
+    );
     const { password: pass, ...user } = validUser._doc;
     res.cookie("token", token, { httpOnly: true }).status(200).json({ user });
   } catch (error) {
@@ -45,15 +48,17 @@ const signIn = async (req, res, next) => {
   }
 };
 const googleSignIn = async (req, res, next) => {
+  const { email, password } = req.body;
   try {
-    const existingUser = await User.findOne({ email: req.body.email });
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
-      const token = jwt.sign({ id: existingUser._id }, process.env.JWT_SECRET);
+      const token = jwt.sign(
+        { id: existingUser._id.toString() },
+        process.env.JWT_SECRET
+      );
+      console.log(token);
       const { password: pass, ...userWithoutPassword } = existingUser._doc;
-      res
-        .cookie("token", token, { httpOnly: true })
-        .status(200)
-        .json({ user: userWithoutPassword });
+      res.cookie("token", token, { httpOnly: true }).status(200).json({ user:userWithoutPassword });
     } else {
       const generatedPassword =
         Math.random().toString(36).slice(-8) +
@@ -73,7 +78,10 @@ const googleSignIn = async (req, res, next) => {
         avatar: req.body.photo,
       });
       console.log(newUser);
-      const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
+      const token = jwt.sign(
+        { id: newUser._id.toString() },
+        process.env.JWT_SECRET
+      );
       const { password: pass, ...user } = newUser;
       res.cookie("token", token, { httpOnly: true }).status(200).json({ user });
     }
