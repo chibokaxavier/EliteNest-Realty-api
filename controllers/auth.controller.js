@@ -58,7 +58,10 @@ const googleSignIn = async (req, res, next) => {
       );
       // console.log(token);
       const { password: pass, ...userWithoutPassword } = existingUser._doc;
-      res.cookie("token", token, { httpOnly: true }).status(200).json({ user:userWithoutPassword });
+      res
+        .cookie("token", token, { httpOnly: true })
+        .status(200)
+        .json({ user: userWithoutPassword });
     } else {
       const generatedPassword =
         Math.random().toString(36).slice(-8) +
@@ -89,5 +92,13 @@ const googleSignIn = async (req, res, next) => {
     next(error);
   }
 };
+const signOut = async (req, res, next) => {
+  try {
+    res.clearCookie("token");
+    res.status(200).json({ message: "User has signed out" });
+  } catch (error) {
+    next(error);
+  }
+};
 
-module.exports = { signUp, signIn, googleSignIn };
+module.exports = { signUp, signIn, googleSignIn, signOut };
