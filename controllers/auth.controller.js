@@ -56,7 +56,7 @@ const googleSignIn = async (req, res, next) => {
         { id: existingUser._id.toString() },
         process.env.JWT_SECRET
       );
-      console.log(token);
+      // console.log(token);
       const { password: pass, ...userWithoutPassword } = existingUser._doc;
       res.cookie("token", token, { httpOnly: true }).status(200).json({ user:userWithoutPassword });
     } else {
@@ -77,12 +77,12 @@ const googleSignIn = async (req, res, next) => {
         password: hashedPassword,
         avatar: req.body.photo,
       });
-      console.log(newUser);
+      // console.log(newUser);
       const token = jwt.sign(
         { id: newUser._id.toString() },
         process.env.JWT_SECRET
       );
-      const { password: pass, ...user } = newUser;
+      const { password: pass, ...user } = newUser._doc;
       res.cookie("token", token, { httpOnly: true }).status(200).json({ user });
     }
   } catch (error) {
