@@ -5,9 +5,6 @@ const bcryptjs = require("bcryptjs");
 
 const updateUser = async (req, res, next) => {
   const { userName, email, password, avatar } = req.body;
-  // if (req.user.id.toString() !== req.params.id.toString()) {
-  //   return console.log(req.user.id);
-  // }
   if (req.user.id.toString() !== req.params.id.toString()) {
     return next(errorHandler(401, "You can only update your own account"));
   }
